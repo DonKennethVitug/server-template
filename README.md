@@ -1,1 +1,1 @@
-# haproxy-template
+# server-template
