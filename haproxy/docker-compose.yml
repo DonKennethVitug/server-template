@@ -1,0 +1,39 @@
+services:
+  haproxy:
+    container_name: haproxy
+    image: ghcr.io/tomdess/docker-haproxy-certbot:master
+    env_file:
+      - .env
+    volumes:
+      - '$PWD/data/letsencrypt:/etc/letsencrypt'
+      - '$PWD/sites.map:/etc/haproxy/sites.map'
+      - '$PWD/haproxy.cfg:/etc/haproxy/haproxy.cfg'
+    networks:
+      - server-network
+    ports:
+      - '80:80'
+      - '443:443'
+
+  www:
+    container_name: www
+    image: nginx
+    volumes:
+      - '$PWD/404.html:/usr/share/nginx/html/index.html'
+    networks:
+      - server-network
+
+  rsyslog:
+    container_name: rsyslog
+    environment:
+      - TZ=UTC
+    volumes:
+      - '$PWD/data/rsyslog/config:/config'
+    networks:
+      - server-network
+    ports:
+      - '514:514'
+    image: 'rsyslog/syslog_appliance_alpine'
+
+networks:
+  server-network:
+    external: true
